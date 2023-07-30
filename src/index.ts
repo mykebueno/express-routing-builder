@@ -1,14 +1,18 @@
 #!/usr/bin/env node
+const fs = require("fs");
+const { program } = require("commander"); 
+const figlet = require("figlet");
 
-import fs from "fs";
-import program from "commander";
+console.log(figlet.textSync("Routing Builder") + "\n");
 
 // Setup commander
 program
-  .version('1.0.0')
+  .version('1.0.0', '-v')
+  .name('rb')
   .description('CLI tool to create Express routing files')
-  .option('-d, --directory <type>', 'Directory to create the file in')
-  .option('-f, --filename <type>', 'Name of the file to create')
+  .option('--dir <path>', 'Directory to file where the route object will be added')
+  .option('--routedir <path>', 'Directory to create the route file')
+  .option('--route <name>', 'Name of the route')
   .parse(process.argv);
 
 const options = program.opts();
@@ -21,6 +25,7 @@ if (!options.directory || !options.filename) {
 
 // Define the file path and content
 const path = `${options.directory}/${options.filename}`;
+
 const content = `
 const express = require('express');
 const router = express.Router();
@@ -34,11 +39,10 @@ module.exports = router;
 `;
 
 // Create the file
-fs.writeFile(path, content, err => {
+fs.writeFile(path, content, (err: Error) => {
   if (err) {
     console.error(`Failed to create file: ${err.message}`);
     process.exit(1);
-  } else {
-    console.log('File created successfully!');
-  }
+  } 
+  console.log('File created successfully!');
 });

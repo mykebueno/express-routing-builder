@@ -2,8 +2,9 @@
   "name": "express-routing-builder",
   "version": "1.0.0",
   "description": "An npm package that allows the developer to create routing application’s endpoints dynamically with ease and automation.",
-  "main": "index.js",
+  "main": "index.ts",
   "scripts": {
+    "build": "npx tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -21,11 +22,15 @@
     "url": "https://github.com/mykebueno/express-routing-builder/issues"
   },
   "homepage": "https://github.com/mykebueno/express-routing-builder#readme",
-  "type": "module",
   "dependencies": {
-    "commander": "^11.0.0"
+    "commander": "^11.0.0",
+    "figlet": "^1.6.0"
   },
   "bin": {
-    "erb": "./index.js"
+    "rb": "./index.js"
+  },
+  "devDependencies": {
+    "@types/node": "^20.4.5",
+    "typescript": "^5.1.6"
   }
 }
