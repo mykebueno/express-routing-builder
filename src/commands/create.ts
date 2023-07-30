@@ -7,8 +7,8 @@ interface RouteOptions {
   dir?: string;
   main: string;
   routedir?: string;
-  route: string;
-  method?: string;
+  routes: string[];
+  methods?: string;
 }
 
 export function createCommand(program: any) {
@@ -22,62 +22,86 @@ export function createCommand(program: any) {
     .addOption(routeOption)
     .addOption(methodOption)
     .action((options: RouteOptions) => {
-
       // Check for required options
-      if (!options.main || !options.route) {
-        console.error('Error: route directory (-rd, --routedir) and route name (-r, --route) options are required.');
+      if (!options.main || !options.routes) {
+        console.error('Error: main file name (-m, --main) and route names (-r, --routes) options are required.');
         process.exit(1);
       }
 
-      CreateRouteFile(options);
+      let routeDirectory = GetRouteDirectory(options.routedir);
 
-      UpdateMainFile(options);
+      let methods = GetMethods(options.methods);
+      
+      let mainDirecory = GetMainDirectory(options.dir);
+
+      options.routes.forEach((route: string) => 
+      {
+        console.log(`Creating route: ${route}`);
+
+        CreateRouteFile(routeDirectory, route, methods);
+
+        UpdateMainFile(mainDirecory, options.main, route);
+      });
     })
 }
 
-function CreateRouteFile(options: RouteOptions)
+function GetMethods(methods?: string) : HttpMethod[]
 {
-  if(!options.routedir)
+  const methodsInput = methods ? methods.split(',').map((method) => method.trim()) : ['get'];
+  const validMethods: HttpMethod[] = ['get', 'post', 'put', 'delete'];
+
+  const methodsFiltered = methodsInput.filter((method) => validMethods.includes(method as HttpMethod)) as HttpMethod[];
+
+  if (methodsFiltered.length === 0) 
+  {
+    console.error('Error: Invalid HTTP method provided. Valid methods are: get/post/put/delete.');
+    process.exit(1);
+  }
+
+  return methodsFiltered;
+}
+
+function GetRouteDirectory(routeDirectory?: string) : string
+{
+  if(!routeDirectory)
   {
     console.warn('Warn: Route directory (-rd, --routedir) not specified. Defaulting to current working directory.');
   }
 
-  const dir = options.routedir || process.cwd();
-  const routePath = `${dir}/${options.route}.js`;
-
-  // Get the methods
-  const methodsInput = options.method ? options.method.split(',') : ['get'];
-  const validMethods: HttpMethod[] = ['get', 'post', 'put', 'delete'];
-
-  const methods = methodsInput.filter((method) => validMethods.includes(method as HttpMethod)) as HttpMethod[];
-
-  if (methods.length === 0) {
-    console.error('Error: Invalid HTTP method provided. Valid methods are: get, post, put, delete.');
-    process.exit(1);
-  }
-
-  const content = generateContent({ route: options.route, methods });
-
-  // Create the file
-  fs.writeFile(routePath, content, (err: Error) => {
-    if (err) {
-      console.error(`Failed to create file: ${err.message}`);
-      process.exit(1);
-    }
-
-    console.log('Route file created successfully!');
-  });
+  return routeDirectory || process.cwd();
 }
 
-function UpdateMainFile(options: RouteOptions)
+function GetMainDirectory(mainDirecory?: string) : string
 {
-  if(!options.dir)
+  if(!mainDirecory)
   {
     console.warn('Warn: Main file directory (-d, --dir) not specified. Defaulting to current working directory.');
   }
 
-  const dir = options.routedir || process.cwd();
-  const appFilePath = path.join(dir, options.main); 
+  return mainDirecory || process.cwd()
+}
+
+function CreateRouteFile(dir: string, route: string, methods: HttpMethod[])
+{
+  const routePath = `${dir}/${route}.js`;
+
+  const content = generateContent({ route: route, methods });
+
+  // Create the file
+  fs.writeFile(routePath, content, (err: Error) => {
+    if (err) 
+    {
+      console.error(`Failed to create file: ${err.message}`);
+      process.exit(1);
+    }
+
+    console.log(`Route file created successfully!`);
+  });
+}
+
+function UpdateMainFile(dir: string, main: string, route: string)
+{
+  const appFilePath = path.join(dir, main); 
 
   fs.readFile(appFilePath, 'utf8', (err: Error, data: any) => {
     if (err) {
@@ -86,7 +110,7 @@ function UpdateMainFile(options: RouteOptions)
     }
 
     // Add import statement
-    const importStatement = `import { router as ${options.route}Router } from './routes/${options.route}';\n`;
+    const importStatement = `import { router as ${route}Router } from './routes/${route}';\n`;
     const importMarker = '/* Import routes here */';
     let newData;
     if (data.includes(importMarker)) {
@@ -96,7 +120,7 @@ function UpdateMainFile(options: RouteOptions)
     }
 
     // Add route use
-    const routeUse = `router.use('/${options.route}', ${options.route}Router);\n`;
+    const routeUse = `router.use('/${route}', ${route}Router);\n`;
     const routeMarker = '/* Insert routes here */';
     let finalData;
     if (newData.includes(routeMarker)) {
