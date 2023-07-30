@@ -1,48 +1,26 @@
 #!/usr/bin/env node
-const fs = require("fs");
-const { program } = require("commander"); 
+import { createCommand } from './commands/create';
+import { updateCommand } from './commands/update';
+import { deleteCommand } from './commands/delete';
+
+const { program} = require("commander"); 
 const figlet = require("figlet");
 
-console.log(figlet.textSync("Routing Builder") + "\n");
+
+console.log(figlet.textSync('Routing Builder', {
+  font: 'cursive'
+}) + "\n");
 
 // Setup commander
 program
-  .version('1.0.0', '-v')
+  .version('1.0.0', '-v, --version', 'output the current version')
   .name('rb')
-  .description('CLI tool to create Express routing files')
-  .option('--dir <path>', 'Directory to file where the route object will be added')
-  .option('--routedir <path>', 'Directory to create the route file')
-  .option('--route <name>', 'Name of the route')
-  .parse(process.argv);
+  .description('CLI tool to create/update/delete Express routing files')
 
-const options = program.opts();
+// Adding the commands
+createCommand(program);
+updateCommand(program);
+deleteCommand(program);
 
-// Check for required options
-if (!options.directory || !options.filename) {
-  console.error('Error: both directory (-d, --directory) and filename (-f, --filename) options are required.');
-  process.exit(1);
-}
-
-// Define the file path and content
-const path = `${options.directory}/${options.filename}`;
-
-const content = `
-const express = require('express');
-const router = express.Router();
-
-// define the home page route
-router.get('/', function (req, res) {
-  res.send('Home page')
-});
-
-module.exports = router;
-`;
-
-// Create the file
-fs.writeFile(path, content, (err: Error) => {
-  if (err) {
-    console.error(`Failed to create file: ${err.message}`);
-    process.exit(1);
-  } 
-  console.log('File created successfully!');
-});
+// Parsing the command line arguments
+program.parse(process.argv);
