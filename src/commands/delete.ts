@@ -17,7 +17,7 @@ export function deleteCommand(program: any) {
     .addOption(routeOption)
     .action((options: RouteOptions) => {
       // Define the file path and content
-      const path = `${options.dir}/${options.route}`;
+      const path = `${options.routedir}/${options.route}`;
 
       const content = `
       const express = require('express');
