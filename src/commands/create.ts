@@ -115,7 +115,7 @@ function GetMainFilePath(mainDir: string, main: string)
 
   if (!fs.existsSync(mainFilePath)) 
   {
-      console.error(`Directory '${mainFilePath}' does not exist.`);
+      logger.error(`Directory '${mainFilePath}' does not exist.`);
 
       process.exit(1);
   }
