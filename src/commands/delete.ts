@@ -11,7 +11,7 @@ export function deleteCommand(program: any) {
 
   program
     .command('delete')
-    .description('Deletes route files')
+    .description('delete routes')
     .addOption(dirOption)
     .addOption(routeDirOption)
     .addOption(routeOption)

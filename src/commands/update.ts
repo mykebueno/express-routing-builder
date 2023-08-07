@@ -12,7 +12,7 @@ export function updateCommand(program: any) {
 
   program
     .command('update')
-    .description('Updates route files')
+    .description('update existing routes')
     .addOption(dirOption)
     .addOption(routeDirOption)
     .addOption(routeOption)

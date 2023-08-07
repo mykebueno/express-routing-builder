@@ -6,13 +6,13 @@ const fs = require("fs");
 function deleteCommand(program) {
     program
         .command('delete')
-        .description('Deletes route files')
+        .description('delete routes')
         .addOption(options_1.dirOption)
         .addOption(options_1.routeDirOption)
         .addOption(options_1.routeOption)
         .action((options) => {
         // Define the file path and content
-        const path = `${options.dir}/${options.route}`;
+        const path = `${options.routedir}/${options.route}`;
         const content = `
       const express = require('express');
       const router = express.Router();

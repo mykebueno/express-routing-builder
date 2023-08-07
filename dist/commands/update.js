@@ -6,14 +6,14 @@ const fs = require("fs");
 function updateCommand(program) {
     program
         .command('update')
-        .description('Updates route files')
+        .description('update existing routes')
         .addOption(options_1.dirOption)
         .addOption(options_1.routeDirOption)
         .addOption(options_1.routeOption)
         .addOption(options_1.methodOption)
         .action((options) => {
         // Define the file path and content
-        const path = `${options.dir}/${options.route}`;
+        const path = `${options.routedir}/${options.route}`;
         const content = `
       const express = require('express');
       const router = express.Router();

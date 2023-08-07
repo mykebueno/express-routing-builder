@@ -24,7 +24,8 @@
   "homepage": "https://github.com/mykebueno/express-routing-builder#readme",
   "dependencies": {
     "commander": "^11.0.0",
-    "figlet": "^1.6.0"
+    "figlet": "^1.6.0",
+    "logging": "^3.3.0"
   },
   "bin": {
     "rb": "./index.js"
